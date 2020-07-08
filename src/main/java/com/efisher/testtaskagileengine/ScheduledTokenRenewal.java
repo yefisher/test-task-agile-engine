@@ -9,22 +9,25 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
 
+import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Properties;
 
 /*
-* Class that implements API token retrieval and updating.
-*
-* */
+ * Class that implements API token retrieval and updating.
+ *
+ * */
 
 @Component
 public class ScheduledTokenRenewal {
 
-    public static String token;
     private static final Logger LOG = LoggerFactory.getLogger(ScheduledTokenRenewal.class);
     private static final SimpleDateFormat SIMPLE_DATE_FORMAT = new SimpleDateFormat("HH:mm:ss");
+
+    public static String token;
 
     public final RestTemplate restTemplate;
 
@@ -43,12 +46,19 @@ public class ScheduledTokenRenewal {
         final String URI = "http://interview.agileengine.com/auth";
 
         Map<String, String> params = new HashMap<>();
-        params.put("apiKey", "23567b218376f79d9415");
+        Properties props = null;
+        try {
+            props = PropertiesUtil.getProperties();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        params.put("apiKey", props.getProperty("apiKey"));
 
         String tokenString = restTemplate.postForObject(URI, params, String.class);
 
         if (tokenString == null || tokenString.isEmpty()) {
-            LOG.info("Something went wrong while authorization to resource. Please, check api key.");
+            LOG.info("Something went wrong while authorization to resource. Please, check an api key.");
             throw new RuntimeException("Failed to retrieve token string.");
         }
 

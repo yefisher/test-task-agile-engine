@@ -12,16 +12,15 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
-import org.springframework.util.ObjectUtils;
 import org.springframework.web.client.RestTemplate;
 
 import java.util.ArrayList;
 import java.util.List;
 
 /*
-* General service class for image info manipulation.
-*
-* */
+ * General service class for image info manipulation.
+ *
+ * */
 
 @Service
 public class ImageService {
@@ -72,14 +71,13 @@ public class ImageService {
         long totalPages = getPages();
         Images images = new Images();
         List<Image> imageList = new ArrayList<>();
+
         for (int currentPage = 1; currentPage <= totalPages; currentPage++) {
             List<Picture> pictures = getImagesOnPage(currentPage).getPictures();
-            for (Picture p : pictures) {
-                Image image = getImageById(p.getId());
-                imageList.add(image);
-            }
+            pictures.forEach(picture -> imageList.add(getImageById(picture.getId())));
         }
         images.setImages(imageList);
+
         return images;
     }
 
@@ -89,9 +87,9 @@ public class ImageService {
     }
 
     /*
-    * Creating header for authorization process.
-    *
-    * */
+     * Creating header for authorization process.
+     *
+     * */
     private HttpHeaders createHeader(String token) {
         return new HttpHeaders() {
             {
